@@ -322,7 +322,11 @@ public class CallingListFragment extends Fragment {
                 , 1, message.extraInfo);
         mainViewModel.ft8TransmitSignal.transmitNow();
         GeneralVariables.resetLaunchSupervision();//复位自动监管
-        navigateToMyCallFragment();//跳转到发射界面
+        
+        // 根据设置决定是否跳转到发射界面
+        if (!GeneralVariables.noAutoSwitchToCall) {
+            navigateToMyCallFragment();//跳转到发射界面
+        }
         return true;
     }
 
@@ -380,7 +384,10 @@ public class CallingListFragment extends Fragment {
                         , 1, ft8Message.extraInfo);
                 mainViewModel.ft8TransmitSignal.transmitNow();
 
-                navigateToMyCallFragment();//跳转到发射界面
+                // 根据设置决定是否跳转到发射界面
+                if (!GeneralVariables.noAutoSwitchToCall) {
+                    navigateToMyCallFragment();//跳转到发射界面
+                }
                 break;
             case 2:
                 Log.d(TAG, "关注：" + ft8Message.getCallsignFrom());
@@ -404,7 +411,11 @@ public class CallingListFragment extends Fragment {
                         , -1, ft8Message.extraInfo);
                 mainViewModel.ft8TransmitSignal.transmitNow();
                 GeneralVariables.resetLaunchSupervision();//复位自动监管
-                navigateToMyCallFragment();//跳转到发射界面
+                
+                // 根据设置决定是否跳转到发射界面
+                if (!GeneralVariables.noAutoSwitchToCall) {
+                    navigateToMyCallFragment();//跳转到发射界面
+                }
                 break;
             case 5://to 的QRZ
                 showQrzFragment(ft8Message.getCallsignTo());

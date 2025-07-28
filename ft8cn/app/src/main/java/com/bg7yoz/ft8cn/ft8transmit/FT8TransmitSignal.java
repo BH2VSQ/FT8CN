@@ -38,6 +38,12 @@ public class FT8TransmitSignal {
     private boolean transmitFreeText = false;
     private String freeText = "FREE TEXT";
 
+    // 新增：动态消息切换支持
+    private volatile boolean messageChangeRequested = false;
+    private int pendingFunctionOrder = -1;
+    private TransmitCallsign pendingCallsign = null;
+    private String pendingExtraInfo = "";
+    
     private final DatabaseOpr databaseOpr;//配置信息，和相关数据的数据库
     private TransmitCallsign toCallsign;//目标呼号
     public MutableLiveData<TransmitCallsign> mutableToCallsign = new MutableLiveData<>();
@@ -469,6 +475,9 @@ public class FT8TransmitSignal {
             audioTrack.release();
             audioTrack = null;
         }
+        
+        // 处理待处理的消息切换
+        processPendingMessageChange();
     }
 
     //当通联成功时的动作
@@ -815,6 +824,16 @@ public class FT8TransmitSignal {
             return;
         }
         ArrayList<Ft8Message> messages = new ArrayList<>(msgList);//防止线程冲突
+        
+        // 优先处理猎犬模式
+        if (processHoundMode(messages)) {
+            return;
+        }
+        
+        // 处理狐狸模式的队列
+        if (GeneralVariables.foxMode && GeneralVariables.queueMode) {
+            updateCallsignQueue(messages);
+        }
 
 
         int newOrder = checkFunctionOrdFromMessages(messages);//检查消息中对方回复的消息序号，-1为没有收到
@@ -1026,6 +1045,119 @@ public class FT8TransmitSignal {
         utcTimer.setTime_sec(sec);
     }
 
+    /**
+     * 动态切换发射消息（发射中途切换）
+     * @param newCallsign 新的目标呼号
+     * @param newFunctionOrder 新的功能序号
+     * @param newExtraInfo 新的额外信息
+     */
+    public void dynamicSwitchMessage(TransmitCallsign newCallsign, int newFunctionOrder, String newExtraInfo) {
+        if (!GeneralVariables.dynamicMessageSwitch) {
+            return; // 如果未启用动态切换，则不处理
+        }
+        
+        if (isTransmitting) {
+            // 如果正在发射，设置待处理的消息
+            messageChangeRequested = true;
+            pendingCallsign = newCallsign;
+            pendingFunctionOrder = newFunctionOrder;
+            pendingExtraInfo = newExtraInfo;
+            
+            // 立即停止当前发射
+            setTransmitting(false);
+            
+            ToastMessage.show("正在切换发射消息...");
+        } else {
+            // 如果没有在发射，直接切换
+            setTransmit(newCallsign, newFunctionOrder, newExtraInfo);
+        }
+    }
+    
+    /**
+     * 处理待处理的消息切换
+     */
+    private void processPendingMessageChange() {
+        if (messageChangeRequested && pendingCallsign != null) {
+            setTransmit(pendingCallsign, pendingFunctionOrder, pendingExtraInfo);
+            messageChangeRequested = false;
+            pendingCallsign = null;
+            pendingFunctionOrder = -1;
+            pendingExtraInfo = "";
+            
+            // 立即开始新的发射
+            if (activated) {
+                transmitNow();
+            }
+        }
+    }
+
+    /**
+     * 支持多槽信息的CQ消息生成
+     */
+    public Ft8Message getMultiSlotCQMessage(String modifier) {
+        if (GeneralVariables.multiSlotMode || GeneralVariables.contestMode) {
+            String customModifier = GeneralVariables.contestMode ? 
+                GeneralVariables.contestModifier : modifier;
+            
+            Ft8Message msg = new Ft8Message(1, 0, "CQ", GeneralVariables.myCallsign
+                    , GeneralVariables.getMyMaidenhead4Grid());
+            if (customModifier != null && !customModifier.isEmpty()) {
+                msg.modifier = customModifier;
+            }
+            return msg;
+        }
+        return getFunctionCommand(6); // 返回标准CQ
+    }
+
+    /**
+     * 狐狸模式消息生成
+     */
+    public ArrayList<Ft8Message> getFoxModeMessages() {
+        ArrayList<Ft8Message> foxMessages = new ArrayList<>();
+        
+        if (GeneralVariables.foxMode && GeneralVariables.queueMode) {
+            // 为队列中的每个呼号生成消息
+            for (int i = 0; i < Math.min(GeneralVariables.callsignQueue.size(), 
+                    GeneralVariables.maxQueueSize); i++) {
+                String callsign = GeneralVariables.callsignQueue.get(i);
+                TransmitCallsign foxCallsign = new TransmitCallsign(1, 0, callsign, 
+                    GeneralVariables.getBaseFrequency(), 
+                    (UtcTimer.getNowSequential() + 1) % 2, 0);
+                
+                Ft8Message foxMsg = new Ft8Message(1, 0, callsign, 
+                    GeneralVariables.myCallsign, "-10"); // 默认信号报告
+                foxMessages.add(foxMsg);
+            }
+        }
+        
+        return foxMessages;
+    }
+
+    /**
+     * 猎犬模式处理
+     */
+    public boolean processHoundMode(ArrayList<Ft8Message> messages) {
+        if (!GeneralVariables.houndMode) {
+            return false;
+        }
+        
+        // 在消息中寻找狐狸台发出的消息
+        for (Ft8Message msg : messages) {
+            if (msg.checkIsCQ() && msg.modifier != null && 
+                (msg.modifier.equals("DX") || msg.modifier.equals("FOX"))) {
+                
+                // 找到狐狸台，立即呼叫
+                TransmitCallsign houndCallsign = new TransmitCallsign(msg.i3, msg.n3, 
+                    msg.getCallsignFrom(), msg.freq_hz, msg.getSequence(), msg.snr);
+                
+                setTransmit(houndCallsign, 1, msg.extraInfo);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     public boolean isTransmitFreeText() {
         return transmitFreeText;
     }
@@ -1041,6 +1173,42 @@ public class FT8TransmitSignal {
         } else {
             ToastMessage.show((GeneralVariables.getStringFromResource(R.string.trans_standard_messge_mode)));
         }
+    }
+
+    /**
+     * 更新呼号队列（用于狐狸模式）
+     */
+    private void updateCallsignQueue(ArrayList<Ft8Message> messages) {
+        for (Ft8Message msg : messages) {
+            if (GeneralVariables.checkIsMyCallsign(msg.getCallsignTo()) && 
+                !GeneralVariables.callsignQueue.contains(msg.getCallsignFrom()) &&
+                GeneralVariables.callsignQueue.size() < GeneralVariables.maxQueueSize) {
+                
+                GeneralVariables.callsignQueue.add(msg.getCallsignFrom());
+                ToastMessage.show("已添加到队列: " + msg.getCallsignFrom());
+            }
+        }
+    }
+    
+    /**
+     * 从队列中移除呼号
+     */
+    public static void removeFromQueue(String callsign) {
+        GeneralVariables.callsignQueue.remove(callsign);
+    }
+    
+    /**
+     * 清空队列
+     */
+    public static void clearQueue() {
+        GeneralVariables.callsignQueue.clear();
+    }
+    
+    /**
+     * 获取队列大小
+     */
+    public static int getQueueSize() {
+        return GeneralVariables.callsignQueue.size();
     }
 
 

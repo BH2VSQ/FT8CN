@@ -74,10 +74,18 @@ public class MyCallingFragment extends Fragment {
             mainViewModel.ft8TransmitSignal.setActivated(true);
             GeneralVariables.transmitMessages.add(message);//把消息添加到关注列表中
         }
-        //呼叫发启者
-        mainViewModel.ft8TransmitSignal.setTransmit(message.getFromCallTransmitCallsign()
-                , 1, message.extraInfo);
-        mainViewModel.ft8TransmitSignal.transmitNow();
+        
+        // 使用动态切换功能
+        if (GeneralVariables.dynamicMessageSwitch && mainViewModel.ft8TransmitSignal.isTransmitting()) {
+            // 如果正在发射且启用了动态切换，使用动态切换方法
+            mainViewModel.ft8TransmitSignal.dynamicSwitchMessage(
+                message.getFromCallTransmitCallsign(), 1, message.extraInfo);
+        } else {
+            // 常规方式
+            mainViewModel.ft8TransmitSignal.setTransmit(message.getFromCallTransmitCallsign()
+                    , 1, message.extraInfo);
+            mainViewModel.ft8TransmitSignal.transmitNow();
+        }
 
         GeneralVariables.resetLaunchSupervision();//复位自动监管
     }
@@ -186,6 +194,10 @@ public class MyCallingFragment extends Fragment {
         //当横屏时显示频谱图
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.messageSpectrumView.run(mainViewModel, this);
+            // 启用分屏模式
+            GeneralVariables.splitScreenMode = true;
+        } else {
+            GeneralVariables.splitScreenMode = false;
         }
 
 
@@ -310,15 +322,32 @@ public class MyCallingFragment extends Fragment {
         mainViewModel.ft8TransmitSignal.mutableToCallsign.observe(getViewLifecycleOwner(), new Observer<TransmitCallsign>() {
             @Override
             public void onChanged(TransmitCallsign transmitCallsign) {
+                String displayText;
                 if (GeneralVariables.toModifier!=null) {
-                    binding.toCallsignTextView.setText(String.format(
+                    displayText = String.format(
                             GeneralVariables.getStringFromResource(R.string.target_callsign)
-                            , transmitCallsign.callsign+" "+GeneralVariables.toModifier));
+                            , transmitCallsign.callsign+" "+GeneralVariables.toModifier);
                 }else {
-                    binding.toCallsignTextView.setText(String.format(
+                    displayText = String.format(
                             GeneralVariables.getStringFromResource(R.string.target_callsign)
-                            , transmitCallsign.callsign));
+                            , transmitCallsign.callsign);
                 }
+                
+                // 添加队列信息显示
+                if (GeneralVariables.queueMode && GeneralVariables.callsignQueue.size() > 0) {
+                    displayText += " (队列:" + GeneralVariables.callsignQueue.size() + ")";
+                }
+                
+                // 添加模式指示
+                if (GeneralVariables.foxMode) {
+                    displayText += " [狐狸模式]";
+                } else if (GeneralVariables.houndMode) {
+                    displayText += " [猎犬模式]";
+                } else if (GeneralVariables.contestMode) {
+                    displayText += " [比赛模式]";
+                }
+                
+                binding.toCallsignTextView.setText(displayText);
             }
         });
 

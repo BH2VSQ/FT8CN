@@ -2085,6 +2085,42 @@ public class DatabaseOpr extends SQLiteOpenHelper {
                 if (name.equalsIgnoreCase("toModifier")) {
                     GeneralVariables.toModifier = result;
                 }
+                
+                // 新增配置项处理
+                if (name.equalsIgnoreCase("multiSlotMode")) {
+                    GeneralVariables.multiSlotMode = result.equals("true");
+                }
+                if (name.equalsIgnoreCase("foxMode")) {
+                    GeneralVariables.foxMode = result.equals("true");
+                }
+                if (name.equalsIgnoreCase("houndMode")) {
+                    GeneralVariables.houndMode = result.equals("true");
+                }
+                if (name.equalsIgnoreCase("contestMode")) {
+                    GeneralVariables.contestMode = result.equals("true");
+                }
+                if (name.equalsIgnoreCase("contestModifier")) {
+                    GeneralVariables.contestModifier = result;
+                }
+                if (name.equalsIgnoreCase("queueMode")) {
+                    GeneralVariables.queueMode = result.equals("true");
+                }
+                if (name.equalsIgnoreCase("maxQueueSize")) {
+                    try {
+                        int size = Integer.parseInt(result);
+                        if (size > 0 && size <= 50) {
+                            GeneralVariables.maxQueueSize = size;
+                        }
+                    } catch (NumberFormatException e) {
+                        GeneralVariables.maxQueueSize = 10; // 默认值
+                    }
+                }
+                if (name.equalsIgnoreCase("dynamicMessageSwitch")) {
+                    GeneralVariables.dynamicMessageSwitch = result.equals("true");
+                }
+                if (name.equalsIgnoreCase("noAutoSwitchToCall")) {
+                    GeneralVariables.noAutoSwitchToCall = result.equals("true");
+                }
                 if (name.equalsIgnoreCase("freq")) {
                     float freq = 1000;
                     try {

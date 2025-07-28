@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            tools:context=".ui.AdvancedConfigFragment">
+
+            <TextView
+                android:id="@+id/title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="高级配置"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/purple_500"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 多槽信息模式 -->
+            <TextView
+                android:id="@+id/multi_slot_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="多槽信息模式"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/multi_slot_mode_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title_text" />
+
+            <Switch
+                android:id="@+id/multi_slot_mode_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/multi_slot_label" />
+
+            <!-- 狐狸模式 -->
+            <TextView
+                android:id="@+id/fox_mode_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="狐狸模式（远征模式）"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/fox_mode_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/multi_slot_label" />
+
+            <Switch
+                android:id="@+id/fox_mode_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/fox_mode_label" />
+
+            <!-- 猎犬模式 -->
+            <TextView
+                android:id="@+id/hound_mode_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="猎犬模式"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/hound_mode_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fox_mode_label" />
+
+            <Switch
+                android:id="@+id/hound_mode_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/hound_mode_label" />
+
+            <!-- 比赛模式 -->
+            <TextView
+                android:id="@+id/contest_mode_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="比赛模式"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/contest_mode_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/hound_mode_label" />
+
+            <Switch
+                android:id="@+id/contest_mode_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/contest_mode_label" />
+
+            <!-- 比赛修饰符 -->
+            <TextView
+                android:id="@+id/contest_modifier_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="比赛修饰符:"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/contest_mode_label" />
+
+            <EditText
+                android:id="@+id/contest_modifier_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:hint="如: DX, FIELD, 001"
+                android:inputType="textCapCharacters"
+                android:maxLength="4"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/contest_modifier_label"
+                app:layout_constraintTop_toTopOf="@+id/contest_modifier_label" />
+
+            <!-- 队列模式 -->
+            <TextView
+                android:id="@+id/queue_mode_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="队列模式"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/queue_mode_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/contest_modifier_edit" />
+
+            <Switch
+                android:id="@+id/queue_mode_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/queue_mode_label" />
+
+            <!-- 最大队列大小 -->
+            <TextView
+                android:id="@+id/max_queue_size_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="最大队列大小:"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/queue_mode_label" />
+
+            <EditText
+                android:id="@+id/max_queue_size_edit"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:hint="10"
+                android:inputType="number"
+                android:textSize="14sp"
+                app:layout_constraintStart_toEndOf="@+id/max_queue_size_label"
+                app:layout_constraintTop_toTopOf="@+id/max_queue_size_label" />
+
+            <!-- 队列信息 -->
+            <TextView
+                android:id="@+id/queue_info_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/editor_style"
+                android:padding="8dp"
+                android:text="当前队列: 0/10"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toStartOf="@+id/clear_queue_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/max_queue_size_edit" />
+
+            <Button
+                android:id="@+id/clear_queue_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="清空队列"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/queue_info_text" />
+
+            <!-- 动态消息切换 -->
+            <TextView
+                android:id="@+id/dynamic_message_switch_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="动态消息切换（发射中途切换）"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/dynamic_message_switch_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/queue_info_text" />
+
+            <Switch
+                android:id="@+id/dynamic_message_switch_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/dynamic_message_switch_label" />
+
+            <!-- 不自动切换到呼叫界面 -->
+            <TextView
+                android:id="@+id/no_auto_switch_to_call_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="选择发射后不自动切换到呼叫界面"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/no_auto_switch_to_call_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dynamic_message_switch_label" />
+
+            <Switch
+                android:id="@+id/no_auto_switch_to_call_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/no_auto_switch_to_call_label" />
+
+            <!-- 说明文本 -->
+            <TextView
+                android:id="@+id/description_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/calling_list_cell_style"
+                android:padding="12dp"
+                android:text="功能说明:\n• 多槽信息模式: 支持解析多槽位信息\n• 狐狸模式: 远征模式，可同时回复多个台站\n• 猎犬模式: 自动寻找并呼叫远征台\n• 比赛模式: 支持自定义呼叫修饰符\n• 队列模式: 支持呼号队列管理\n• 动态消息切换: 发射中途可以切换消息\n• 横屏模式: 自动启用左右分屏显示"
+                android:textSize="12sp"
+                android:textColor="@color/bar_text_view_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/no_auto_switch_to_call_label"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="16dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>
