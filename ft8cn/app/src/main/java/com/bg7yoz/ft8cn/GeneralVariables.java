@@ -163,6 +163,22 @@ public class GeneralVariables {
 
     public static String myCallsign = "";//我的呼号
     public static String toModifier = "";//呼叫的修饰符
+
+    // 新增：多槽信息和远征模式支持
+    public static boolean multiSlotMode = false;//多槽信息模式
+    public static boolean foxMode = false;//狐狸模式
+    public static boolean houndMode = false;//猎犬模式
+    public static boolean contestMode = false;//比赛模式
+    public static String contestModifier = "";//比赛自定义修饰符
+    public static boolean queueMode = false;//队列模式
+    public static int maxQueueSize = 10;//最大队列大小
+    public static ArrayList<String> callsignQueue = new ArrayList<>();//呼号队列
+    public static boolean dynamicMessageSwitch = true;//动态消息切换（发射中途切换）
+
+    // 新增：横屏分屏模式
+    public static boolean splitScreenMode = false;//分屏模式（横屏时）
+    public static boolean noAutoSwitchToCall = false;//选择发射后不自动切换到呼叫界面
+
     private static float baseFrequency = 1000;//声音频率
 
     public static boolean simpleCallItemMode = false;//紧凑型消息
